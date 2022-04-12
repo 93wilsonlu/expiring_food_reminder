@@ -1,4 +1,4 @@
-from expiring_food_reminder import line_bot_api, db
+from expiring_food_reminder import line_bot_api, db, TODAY
 from linebot.models import TextSendMessage
 from .model import Food
 from datetime import datetime, timedelta
@@ -22,13 +22,13 @@ def handle_add(event):
         try:
             suffix = event.message.text.split(' ')[3]
             if suffix == 'day':
-                expiry_time = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) + \
+                expiry_time = TODAY + \
                     timedelta(days=int(time_string))
             elif suffix == 'month':
-                expiry_time = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) + \
+                expiry_time = TODAY + \
                     timedelta(days=int(time_string) * 30)
             elif suffix == 'year':
-                expiry_time = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) + \
+                expiry_time = TODAY + \
                     timedelta(days=int(time_string) * 365)
             else:
                 raise InputFormatError('格式錯誤')
@@ -56,10 +56,10 @@ def handle_read(event):
         food_list = foods.all()
     elif read_method == 'expiring':
         food_list = foods.filter(
-            Food.expiry_time == datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)).all()
+            Food.expiry_time == TODAY).all()
     elif read_method == 'expired':
         food_list = foods.filter(
-            Food.expiry_time < datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)).all()
+            Food.expiry_time < TODAY).all()
     else:
         raise InputFormatError('格式錯誤')
 
