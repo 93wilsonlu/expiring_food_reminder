@@ -3,11 +3,12 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
-from linebot.models import MessageEvent, TextMessage, TextSendMessage
+from linebot.models import MessageEvent, TextMessage, FlexSendMessage
 from .config import config_dict
 import os
 from datetime import datetime
 from sqlalchemy import func
+from .flex_food_list import FlexFoodList
 
 line_bot_api = LineBotApi(os.environ.get('CHANNEL_ACCESS_TOKEN'))
 handler = WebhookHandler(os.environ.get('CHANNEL_SECRET'))
@@ -43,16 +44,18 @@ def create_app(config='develop'):
     def daily_work():
         if request.values.get('password') != app.config.get('DAILY_WORK_PASSWORD'):
             return 'Failed!'
-        
+
         TODAY = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
-        food_list = db.session.query(Food.owner_id, func.group_concat(
-            Food.food_name, '\n')).group_by(Food.owner_id).all()
-        for food in food_list:
-            owner_id, food_name = food
-            if food_name:
-                cnt = food_name.count('\n') + 1
-                line_bot_api.push_message(owner_id, TextSendMessage(
-                    text=f"今天有 {cnt} 個食物快要到期了:\n{food_name}"))
+        food_list = Food.query.filter_by(
+            expiry_time=TODAY).order_by('owner_id').all()
+
+        result = FlexFoodList('今天到期的食物')
+        for i in range(len(food_list)):
+            result.append_food(food_list[i])
+            if i == len(food_list) - 1 or food_list[i].owner_id != food_list[i + 1].owner_id:
+                line_bot_api.push_message(
+                    food_list[i].owner_id, FlexSendMessage(alt_text='今天到期的食物...', contents=result.message))
+                result.reset()
         app.logger.info('Daily work finished!')
         return 'Success!'
 

@@ -1,7 +1,8 @@
 from expiring_food_reminder import line_bot_api, db, TODAY
-from linebot.models import TextSendMessage
+from linebot.models import TextSendMessage, FlexSendMessage
 from .model import Food
 from datetime import datetime, timedelta
+from .flex_food_list import FlexFoodList
 
 
 class InputFormatError(Exception):
@@ -63,11 +64,11 @@ def handle_read(event):
     else:
         raise InputFormatError('格式錯誤')
 
-    result = '以下是查詢結果:'
+    result = FlexFoodList('查詢結果')
     for food in food_list:
-        result += f"\n{food.id} {food.food_name} {food.expiry_time.strftime('%Y-%m-%d')}"
+        result.append_food(food)
     line_bot_api.reply_message(
-        event.reply_token, TextSendMessage(text=result))
+        event.reply_token, FlexSendMessage(alt_text='查詢結果...', contents=result.message))
 
 
 def handle_edit(event):
