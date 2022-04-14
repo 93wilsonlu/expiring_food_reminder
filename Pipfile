@@ -10,6 +10,8 @@ flask-sqlalchemy = "*"
 flask-migrate = "*"
 gunicorn = "*"
 psycopg2-binary = "*"
+apscheduler = "*"
+requests = "*"
 
 [dev-packages]
 flake8 = "*"
