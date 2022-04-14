@@ -62,20 +62,25 @@ def create_app(config='develop'):
     from .commands import init_cli
     init_cli(app)
 
-    from .message_handler import handle_add, handle_read, handle_edit, handle_delete, handle_other
+    from .message_handler import handle_add, handle_read, handle_edit, handle_delete, display_help, handle_other
 
     @handler.add(MessageEvent, message=TextMessage)
     def main_handler(event):
-        action_type = event.message.text.split(' ')[0]
-        if action_type == 'add':
-            handle_add(event)
-        elif action_type == 'read':
-            handle_read(event)
-        elif action_type == 'edit':
-            handle_edit(event)
-        elif action_type == 'delete':
-            handle_delete(event)
-        else:
+        try:
+            action_type = event.message.text.split(' ')[0]
+            if action_type == 'add':
+                handle_add(event)
+            elif action_type == 'read':
+                handle_read(event)
+            elif action_type == 'edit':
+                handle_edit(event)
+            elif action_type == 'delete':
+                handle_delete(event)
+            elif action_type == 'help':
+                display_help(event)
+            else:
+                handle_other(event)
+        except:
             handle_other(event)
 
     return app

@@ -122,3 +122,21 @@ def handle_delete(event):
     db.session.commit()
     line_bot_api.reply_message(
         event.reply_token, TextSendMessage(text="刪除成功"))
+
+
+def display_help(event):
+    line_bot_api.reply_message(
+        event.reply_token, TextSendMessage(text='''
+        新增：
+            add 名字 時間
+                ex. add eggs 2000-01-01
+            add 名字 時間 單位(day,month,year)
+                ex. add eggs 3 day
+        修改：
+            edit {id} 名字 時間
+            edit {id} 名字 單位(day,month,year)
+        查看：
+            read {id}/all/expired/expiring
+        刪除：
+            delete {id}/all/expired/expiring
+        '''))
