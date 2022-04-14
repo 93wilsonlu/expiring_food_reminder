@@ -48,7 +48,7 @@ def handle_add(event):
 
 def handle_read(event):
     read_method = event.message.text.split(' ')[1]
-    foods = Food.query.filter_by(owner_id=event.source.user_id).all()
+    foods = Food.query.filter_by(owner_id=event.source.user_id)
     if read_method == 'count':
         line_bot_api.reply_message(event.reply_token, TextSendMessage(
             text=str(foods.count())))
@@ -93,4 +93,32 @@ def handle_edit(event):
 
 
 def handle_delete(event):
-    pass
+    delete_method = event.message.text.split(' ')[1]
+    if delete_method.isdigit():
+        id = int(delete_method)
+        food = Food.query.filter_by(id=id).first()
+        if not food or food.owner_id != event.source.user_id:
+            line_bot_api.reply_message(
+                event.reply_token, TextSendMessage(text="刪除失敗"))
+        else:
+            db.session.delete(food)
+            db.session.commit()
+            line_bot_api.reply_message(
+                event.reply_token, TextSendMessage(text="刪除成功"))
+        return
+
+    foods = Food.query.filter_by(owner_id=event.source.user_id)
+    if delete_method == 'all':
+        food_list = foods
+    elif delete_method == 'expiring':
+        food_list = foods.filter(
+            Food.expiry_time == TODAY)
+    elif delete_method == 'expired':
+        food_list = foods.filter(
+            Food.expiry_time < TODAY)
+    else:
+        raise InputFormatError('格式錯誤')
+    food_list.delete()
+    db.session.commit()
+    line_bot_api.reply_message(
+        event.reply_token, TextSendMessage(text="刪除成功"))
