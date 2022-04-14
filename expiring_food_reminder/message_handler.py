@@ -14,27 +14,28 @@ def handle_other(event):
         event.reply_token, TextSendMessage(text="無法處理這則訊息，也許你可以看看詳細說明"))
 
 
-def handle_add(event):
-    food_name = event.message.text.split(' ')[1]
-    time_string = event.message.text.split(' ')[2]
+def handle_time_string(time_string, suffix):
     if '-' in time_string:
-        expiry_time = datetime.strptime(time_string, '%Y-%m-%d')
+        return datetime.strptime(time_string, '%Y-%m-%d')
+    if suffix == 'day':
+        return TODAY + \
+            timedelta(days=int(time_string))
+    if suffix == 'month':
+        return TODAY + \
+            timedelta(days=int(time_string) * 30)
+    if suffix == 'year':
+        return TODAY + \
+            timedelta(days=int(time_string) * 365)
+    raise InputFormatError('格式錯誤')
+
+
+def handle_add(event):
+    if event.message.text.count(' ') + 1 == 3:
+        _, food_name, time_string = event.message.text.split(' ')
+        expiry_time = handle_time_string(time_string, None)
     else:
-        try:
-            suffix = event.message.text.split(' ')[3]
-            if suffix == 'day':
-                expiry_time = TODAY + \
-                    timedelta(days=int(time_string))
-            elif suffix == 'month':
-                expiry_time = TODAY + \
-                    timedelta(days=int(time_string) * 30)
-            elif suffix == 'year':
-                expiry_time = TODAY + \
-                    timedelta(days=int(time_string) * 365)
-            else:
-                raise InputFormatError('格式錯誤')
-        except:
-            raise InputFormatError('格式錯誤')
+        _, food_name, time_string, suffix = event.message.text.split(' ')
+        expiry_time = handle_time_string(time_string, suffix)
 
     food = Food(food_name=food_name, owner_id=event.source.user_id,
                 expiry_time=expiry_time)
@@ -47,7 +48,7 @@ def handle_add(event):
 
 def handle_read(event):
     read_method = event.message.text.split(' ')[1]
-    foods = Food.query.filter_by(owner_id=event.source.user_id)
+    foods = Food.query.filter_by(owner_id=event.source.user_id).all()
     if read_method == 'count':
         line_bot_api.reply_message(event.reply_token, TextSendMessage(
             text=str(foods.count())))
@@ -72,7 +73,23 @@ def handle_read(event):
 
 
 def handle_edit(event):
-    pass
+    if event.message.text.count(' ') + 1 == 4:
+        _, id, food_name, time_string = event.message.text.split(' ')
+        expiry_time = handle_time_string(time_string, None)
+    else:
+        _, id, food_name, time_string, suffix = event.message.text.split(' ')
+        expiry_time = handle_time_string(time_string, suffix)
+    food = Food.query.filter_by(id=id).first()
+    if not food or food.owner_id != event.source.user_id:
+        line_bot_api.reply_message(
+            event.reply_token, TextSendMessage(text="修改失敗"))
+        return
+    food.food_name = food_name
+    food.expiry_time = expiry_time
+    db.session.add(food)
+    db.session.commit()
+    line_bot_api.reply_message(
+        event.reply_token, TextSendMessage(text="修改成功"))
 
 
 def handle_delete(event):
