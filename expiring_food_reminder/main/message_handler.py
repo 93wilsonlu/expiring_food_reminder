@@ -131,7 +131,7 @@ def display_help(event):
             add 名字 時間
                 ex. add eggs 2000-01-01
             add 名字 時間 單位(day,month,year)
-                ex. add eggs 3 day
+                add eggs 3 day
         修改：
             edit {id} 名字 時間
             edit {id} 名字 單位(day,month,year)

@@ -6,6 +6,7 @@ project_dir = os.path.abspath(os.path.dirname(__file__))
 class Config:
     SECRET_KEY = os.environ['SECRET_KEY']
     DAILY_WORK_PASSWORD = os.environ['DAILY_WORK_PASSWORD']
+    LIFF_ID = os.environ['LIFF_ID']
 
 
 class DevelopmentConfig(Config):
