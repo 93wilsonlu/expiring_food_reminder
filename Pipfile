@@ -12,6 +12,8 @@ gunicorn = "*"
 psycopg2-binary = "*"
 apscheduler = "*"
 requests = "*"
+flask-wtf = "*"
+bootstrap-flask = "*"
 
 [dev-packages]
 flake8 = "*"

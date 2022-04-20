@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}
+  詳細資訊
+{% endblock title %}
+{% block content %}
+  <div class="container">
+    <div class="card">
+      <div class="card-header">過期食物提醒機器人</div>
+      <div class="list-group">
+        <div class="list-group-item">
+          <div class="fw-bold">新增</div>
+          按圖文選單的「新增」
+        </div>
+        <div class="list-group-item">
+          <div class="fw-bold">修改</div>
+          按圖文選單的「修改」
+        </div>
+        <div class="list-group-item">
+          <div class="fw-bold">查看</div>
+          <ul>
+            <li>
+              查看某筆資料
+              <br />
+              輸入 read {id}
+            </li>
+            <li>
+              查看特定資料
+              <br />
+              輸入 read (all/expired/expiring)
+            </li>
+          </ul>
+        </div>
+        <div class="list-group-item">
+          <div class="fw-bold">刪除</div>
+          <ul>
+            <li>
+              刪除某筆資料
+              <br />
+              輸入 delete {id}
+            </li>
+            <li>
+              刪除特定資料
+              <br />
+              輸入 delete (all/expired/expiring)
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="card-footer">
+        <a href="https://github.com/93wilsonlu/expiring_food_reminder" target="_blank">代碼</a>
+      </div>
+    </div>
+  </div>
+{% endblock content %}

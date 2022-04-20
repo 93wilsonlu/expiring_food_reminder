@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% from 'bootstrap5/form.html' import render_form %}
+{% block title %}
+  {{ title }}
+{% endblock title %}
+{% block content %}
+  {{ super() }}
+  <div class="container mt-2">{{ render_form(form) }}</div>
+  <div id="txt"></div>
+  <script>
+    document.getElementById("user_id").value = liff.getContext()['userId'];
+    document.getElementById("txt").innerHTML = liff.getContext()['userId'];
+  </script>
+{% endblock content %}

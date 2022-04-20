@@ -31,11 +31,27 @@ class FlexFoodList:
                     "text": str(food.id) + '. ' + food.food_name
                 },
                 {
-                    "type": "text",
-                    "text": food.expiry_time.strftime('%Y-%m-%d'),
-                    "size": "sm",
-                    "gravity": "bottom",
-                    "align": "end"
+                    "type": "box",
+                    "layout": "horizontal",
+                    "contents": [
+                        {
+                            "type": "text",
+                            "text": food.expiry_time.strftime('%Y-%m-%d'),
+                            "size": "xs",
+                            "gravity": "center"
+                        },
+                        {
+                            "type": "text",
+                            "text": "delete",
+                            "action": {
+                                "type": "message",
+                                "label": "action",
+                                "text": "delete " + str(food.id)
+                            },
+                            "color": "#ff0000",
+                            "flex": 0
+                        }
+                    ]
                 }
             ],
             "margin": "lg",
