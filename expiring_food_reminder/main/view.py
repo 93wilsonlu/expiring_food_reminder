@@ -39,6 +39,10 @@ def edit():
             flash('編輯失敗')
     return render_template('form.html', form=form, title='編輯食物')
 
+@main.route('/info')
+def info():
+    return render_template('info.html')
+
 
 @main.route("/daily_work", methods=['POST'])
 def daily_work():
