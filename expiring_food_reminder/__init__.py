@@ -53,8 +53,21 @@ def create_app(config='develop'):
     from .main import main
     app.register_blueprint(main)
 
+    from .main.message_handler import handle_read, handle_delete, display_help, handle_other
+
     @handler.add(MessageEvent, message=TextMessage)
     def main_handler(event):
-        pass
+        try:
+            action_type = event.message.text.split(' ')[0]
+            if action_type == 'read':
+                handle_read(event)
+            elif action_type == 'delete':
+                handle_delete(event)
+            elif action_type == 'help':
+                display_help(event)
+            else:
+                handle_other(event)
+        except:
+            handle_other(event)
 
     return app

@@ -1,6 +1,6 @@
 from expiring_food_reminder import db, line_bot_api
 from .model import Food
-from .form import FormAddFood
+from .form import FormAddFood, FormEditFood
 from .flex_food_list import FlexFoodList
 from flask import current_app, flash, redirect, render_template, request, url_for
 from datetime import datetime
@@ -22,8 +22,22 @@ def add():
         db.session.add(food)
         db.session.commit()
         flash('新增成功')
-        redirect(url_for('main.add'))
-    return render_template('add.html', form=form)
+    return render_template('form.html', form=form,title='新增食物')
+
+
+@main.route('/edit', methods=['GET', 'POST'])
+def edit():
+    form = FormEditFood()
+    if form.validate_on_submit():
+        food = Food.query.filter_by(id=form.id.data).first()
+        if food and food.owner_id == form.user_id.data:
+            food.food_name = form.food_name.data
+            food.expiry_time = form.expiry_time.data
+            db.session.commit()
+            flash('編輯成功')
+        else:
+            flash('編輯失敗')
+    return render_template('form.html', form=form, title='編輯食物')
 
 
 @main.route("/daily_work", methods=['POST'])
@@ -44,4 +58,3 @@ def daily_work():
             result.reset()
     current_app.logger.info('Daily work finished!')
     return 'Success!'
-
